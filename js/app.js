@@ -18,10 +18,12 @@ function addTask(task, id) {
     let input = document.createElement('input');
     let delet = document.createElement('i');
 
+    // set styles
     settings.input.styles.forEach( style => input.classList.add(style) );
     settings.list.styles.forEach( style => listItem.classList.add(style) );
     settings.icon.styles.forEach( style => delet.classList.add(style) );
 
+    // set atributtes and correct order
     delet.innerHTML = 'delete';
     input.setAttribute('type', settings.input.type);
     listItem.setAttribute( 'data-id', id);
@@ -45,7 +47,7 @@ function postHandler(id, state) {
     if(state){
         input.parentElement.querySelector('span')
             .classList
-            .toggle('done');
+            .add('done');
         input.checked = true;
     }
 
@@ -80,6 +82,8 @@ form.addEventListener('submit', (e) => {
         done: false,
         title: form.task.value
     }
-    db.collection('todo').add(task).then( _ => addTask(task, _.id));
+    db.collection('todo')
+    .add(task)
+    .then( doc => addTask(task, doc.id));
 });
 
