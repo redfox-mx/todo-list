@@ -28,7 +28,7 @@ function addTask(task, id) {
     input.setAttribute('type', settings.input.type);
     listItem.setAttribute( 'data-id', id);
     listItem.appendChild(input);
-    listItem.innerHTML += '<span>' + task.title + '</span>';
+    listItem.innerHTML += '<span class="text-truncate">' + task.title + '</span>';
     listItem.appendChild(delet);
 
     list.appendChild(listItem);
