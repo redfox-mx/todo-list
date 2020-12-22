@@ -1,0 +1,12 @@
+body{
+    background-color:#46587a;
+    margin-top: 5rem;
+}
+
+h2, h3, h4{
+    color: white;
+}
+
+.done{
+    text-decoration: line-through;
+}
