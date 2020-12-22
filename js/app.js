@@ -22,14 +22,41 @@ function addTask(task, id) {
     listItem.appendChild(input);
     listItem.innerHTML += task.title;
 
-    if(task.done) listItem.classList.add('done');
-
     list.appendChild(listItem);
+    postHandler(id, task.done);
+}
+
+function postHandler(id, state) {
+    let input = document.querySelector(`[data-id=${id}] input`); 
+
+    if(state){
+        input.parentElement.classList.add('done');
+        input.checked = true;
+    }
+
+    let hander = (event) => {
+        db.collection('todo').doc(id).update({
+            done: event.target.checked
+        })
+        .then( () => {
+            event.target.parentElement.classList.toggle('done');
+        });
+    }
+
+    input.addEventListener('click', hander);
 }
 
 db.collection('todo').get().then((snapshot)=>{
     snapshot.docs.forEach( doc => addTask(doc.data(), doc.id) )
 })
 
-
+let form = document.getElementById('todo-form');
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let task = {
+        done: false,
+        title: form.task.value
+    }
+    db.collection('todo').add(task).then( _ => console.log(_.id))
+});
 
