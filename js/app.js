@@ -4,7 +4,10 @@ const settings = {
         type: 'checkbox'
     },
     list: {
-        styles: ['list-group-item']
+        styles: ['list-group-item', 'd-flex']
+    },
+    icon: {
+        styles: ['material-icons-outlined', 'icon']
     }
 }
 
@@ -13,37 +16,57 @@ let list = document.getElementById('task-list');
 function addTask(task, id) {
     let listItem = document.createElement('li');
     let input = document.createElement('input');
+    let delet = document.createElement('i');
 
     settings.input.styles.forEach( style => input.classList.add(style) );
     settings.list.styles.forEach( style => listItem.classList.add(style) );
+    settings.icon.styles.forEach( style => delet.classList.add(style) );
 
+    delet.innerHTML = 'delete';
     input.setAttribute('type', settings.input.type);
     listItem.setAttribute( 'data-id', id);
     listItem.appendChild(input);
-    listItem.innerHTML += task.title;
+    listItem.innerHTML += '<span>' + task.title + '</span>';
+    listItem.appendChild(delet);
 
     list.appendChild(listItem);
     postHandler(id, task.done);
 }
 
+function removeTask(id) {
+    let listItem = document.querySelector(`li[data-id=${''+id}]`);
+    list.removeChild(listItem);
+}
+
 function postHandler(id, state) {
-    let input = document.querySelector(`[data-id=${id}] input`); 
+    let input = document.querySelector(`[data-id=${''+id}] input`); 
+    let trash = document.querySelector(`[data-id=${''+id}] .icon`); 
 
     if(state){
-        input.parentElement.classList.add('done');
+        input.parentElement.querySelector('span')
+            .classList
+            .toggle('done');
         input.checked = true;
     }
 
-    let hander = (event) => {
+    let checkedHander = (event) => {
         db.collection('todo').doc(id).update({
             done: event.target.checked
         })
         .then( () => {
-            event.target.parentElement.classList.toggle('done');
+            event.target.parentElement.querySelector('span')
+            .classList
+            .toggle('done');
         });
     }
 
-    input.addEventListener('click', hander);
+    let deleteHandler = (event) => {
+        db.collection('todo').doc(id).delete()
+        .then(removeTask(id));
+    }
+
+    input.addEventListener('click', checkedHander);
+    trash.addEventListener('click', deleteHandler);
 }
 
 db.collection('todo').get().then((snapshot)=>{
@@ -57,6 +80,6 @@ form.addEventListener('submit', (e) => {
         done: false,
         title: form.task.value
     }
-    db.collection('todo').add(task).then( _ => console.log(_.id))
+    db.collection('todo').add(task).then( _ => addTask(task, _.id));
 });
 
